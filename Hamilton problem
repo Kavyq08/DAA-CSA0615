@@ -1,0 +1,151 @@
+#include <stdio.h>
+
+#include <stdbool.h>
+
+#define MAX_VERTICES 10 8
+
+int V; 
+
+bool isSafe(int v, bool graph[MAX_VERTICES][MAX_VERTICES], int path[], int pos) {
+
+    if (graph[path[pos - 1]][v] == 0)
+
+        return false;
+
+		for (int i = 0; i < pos; i++) {
+
+        if (path[i] == v)
+
+            return false;
+
+    }
+
+    return true;
+
+}
+
+int calculatePathLength(bool graph[MAX_VERTICES][MAX_VERTICES], int path[]) {
+
+    int length = 0;
+
+    for (int i = 0; i < V - 1; i++) {
+
+        length += graph[path[i]][path[i + 1]];
+
+    }
+
+    length += graph[path[V - 1]][path[0]]; 
+
+    return length;
+
+}
+
+void hamiltonianCycleUtil(bool graph[MAX_VERTICES][MAX_VERTICES], int path[], int pos, int* minPathLength) {
+
+    if (pos == V) {
+
+        int length = calculatePathLength(graph, path);
+
+        if (length < *minPathLength) {
+
+            *minPathLength = length+1;
+
+            printf("New shortest Hamiltonian circuit: ");
+
+            for (int i = 0; i < V; i++)
+
+                printf("%d ", path[i]);
+
+            printf("%d\n", path[0]); 
+
+        }
+
+        return;
+
+    }
+
+    for (int v = 1; v < V; v++) {
+
+        if (isSafe(v, graph, path, pos)) {
+
+            path[pos] = v;
+
+
+
+            hamiltonianCycleUtil(graph, path, pos + 1, minPathLength);
+
+
+
+            path[pos] = -1;
+
+        }
+
+    }
+
+}
+
+
+
+void hamiltonianCycle(bool graph[MAX_VERTICES][MAX_VERTICES]) {
+
+    int path[MAX_VERTICES];
+
+    for (int i = 0; i < V; i++)
+
+        path[i] = -1;
+
+
+
+    path[0] = 0;
+
+    int minPathLength = _INT_MAX_;
+
+
+
+    hamiltonianCycleUtil(graph, path, 1, &minPathLength);
+
+
+
+    if (minPathLength == _INT_MAX_) {
+
+        printf("No Hamiltonian circuit exists.\n");
+
+    } else {
+
+        printf("Shortest Hamiltonian circuit length: %d\n", minPathLength);
+
+    }
+
+}
+
+
+
+int main() {
+
+    printf("Enter the number of vertices in the graph (maximum %d): ", MAX_VERTICES);
+
+    scanf("%d", &V);
+
+
+
+    bool graph[MAX_VERTICES][MAX_VERTICES];
+
+
+
+    printf("Enter the weighted adjacency matrix of the graph (0 for no edge):\n");
+
+    for (int i = 0; i < V; i++) {
+
+        for (int j = 0; j < V; j++) {
+
+            scanf("%d", &graph[i][j]);
+
+        }
+
+    }
+
+    hamiltonianCycle(graph);
+
+    return 0;
+
+}
